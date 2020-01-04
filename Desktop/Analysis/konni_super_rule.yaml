@@ -1,0 +1,52 @@
+rule Konni_2019 {
+    
+     meta:
+      description = "Yara rules for Konni samples 2019, contains unique strings from the dll; also conatins opcode sequence for the decoding routine and api calls "
+      author = "Doron Karmi"
+      email = doron@cyberint.com
+      date = "2019-11-30"
+      hash1 = "6256ba2b89c78877328cc70d45db980310a51545a83d1d922d64048b57d6c057"
+      hash2 = "7d2b1af486610a45f78a573af9a9ad00414680ff8e958cfb5437a1b140acb60c"
+    
+    strings:
+    	//unique string for lure doc
+      $a1 = "sexplorer.exe" fullword ascii
+      $a2 = "\\Temp\\" fullword ascii
+    	
+    	//unique strings for dll
+      $m1 = "%ws %ws" fullword ascii
+      $m2 = "post.txt" fullword wide 
+      $m3 = "temp.zip" fullword wide 
+      $m4 = "temp.ini" fullword wide 
+      $m5 = "to everyone" fullword wide 
+      $m6 = "sto %s " fullword wide 
+      $m7 = "/htdocs/" fullword wide
+    	
+    	//api calls
+      $f1 = "lstrlenA" fullword
+      $f2 = "lstrcpynA" fullword
+      $f3 = "lstrlenW" fullword
+      $f4 = "lstrcmpiW" fullword
+      $f5 = "lstrcatW" fullword
+      $f6 = "lstrcpyW" fullword
+      $f7 = "lstrcpyA" fullword
+      $f8 = "IsProcessorFeaturePresent" fullword
+      $f9 = "StrChrA" fullword
+      $f10 = "StrCmpNW" fullword
+      $f11 = "StrStrW" fullword
+      $f12 = "StrRChrW" fullword 
+      $f13 = "wsprintfA" fullword
+      $f14 = "wsprintfW" fullword
+
+    	//base64 decoding routine
+      $code = {0f b6 fb 8a 9f 00 ?? 00 10 0f b6 7d 7d 88 1c 30 8a 9f 00 ?? 00 10 8b 7d f8 88 5c 30 01 0f b6 d2 8a 92 00 ?? 00 10 0f b6 c9 88 54 30 02 8a 89 00 ?? 00 10 88 4c 30 03 83 c0 04 3b 7d 0c 0f 8c ?? ?? ??}
+    
+    	//count
+      $c1 = "%ws"
+    	
+    	//count2
+      $c2 = "%ws %ws" fullword ascii
+    
+    condition:
+     uint16(0) == 0x5a4d and file_type contains "pedll" and filesize < 60KB and (($code) or (all of ($a*)) or (10 of ($f*) and 1 of ($m*)) or (3 of ($m*)) or ((#c1 > 10 and #c1 < 15) and 2 of ($m*)) or ((#c2 > 1 and #c2 <5) and 2 of ($m*)))
+    }
