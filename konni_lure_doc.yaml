@@ -1,0 +1,27 @@
+rule Konni_lure_doc {
+    
+    meta: 
+    author = "Doron Karmi"
+    email =  "doron@cyberint.com"
+    Description =  "Marco functions and varibles used within lure docs of Konni campigian"
+    Hash = "4c201f9949804e90f94fe91882cb8aad3e7daf496a7f4e792b9c7fed95ab0726"
+    
+    strings:
+		// unique
+      $s1 = "Shell" fullword ascii
+      $s2 = "sCmdLine" fullword ascii
+      $s3 = "Environ" fullword ascii
+      $s4 = "Hex2Chr" fullword ascii
+      $s5 = "nResult" fullword ascii
+      $s6 = "vbHide" fullword ascii
+    
+		// auto-open
+      $a1 = "AutoOpen" fullword ascii
+      $a2 = "Document_Open" fullword ascii
+      
+    
+    condition:
+    
+    (4 of ($s*) and 1 of ($a*) or 5 of ($s*))
+    
+    }
